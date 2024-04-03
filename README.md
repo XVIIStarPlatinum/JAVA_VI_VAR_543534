@@ -5,6 +5,10 @@ ___
 
 ## Лабораторная работа `#6`
 
+<p align="center">
+    <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZWw1cXhwaTI3OXU3Zzdod3dsajNnZ3dleHh2dHJmemxlcGxlYnBtdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/TyFdAtfZBODNC/giphy.gif" alt="Client-vs-Server" />
+</p>
+
 ### `Вариант 543534`
 
 ## Результат: ${\color{green}?\\%}$
