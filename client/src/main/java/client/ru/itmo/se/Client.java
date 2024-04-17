@@ -9,7 +9,11 @@ import common.ru.itmo.se.utility.PrettyPrinter;
 
 import java.io.*;
 import java.net.InetSocketAddress;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.Objects;
+import java.util.Set;
 
 public class Client {
     private String host;
@@ -19,6 +23,7 @@ public class Client {
     private int maxReconnectionAttempts;
     private UserHandler userHandler;
     private SocketChannel socketChannel;
+    private Selector selector;
     private ObjectOutputStream serverWriter;
     private ObjectInputStream serverReader;
 
@@ -88,15 +93,25 @@ public class Client {
     private boolean processRequestToServer() {
         Request requestToServer = null;
         Response responseFromServer = null;
+        socketChannel = null;
         do {
             try {
-                requestToServer = responseFromServer != null ? userHandler.handle(responseFromServer.getResponseCode()) : userHandler.handle(null);
-                if(requestToServer.isEmpty()) {
-                    continue;
+                selector.select();
+                Set<SelectionKey> selectedKeys = selector.selectedKeys();
+                for(SelectionKey key : selectedKeys) {
+                    if(key.isWritable()) {
+                        socketChannel = (SocketChannel) key.channel();
+                        requestToServer = responseFromServer != null ? userHandler.handle(responseFromServer.getResponseCode()) : userHandler.handle(null);
+                        if(requestToServer.isEmpty()) {
+                            continue;
+                        }
+                        serverWriter.writeObject(requestToServer);
+                        responseFromServer = (Response) serverReader.readObject();
+                        PrettyPrinter.print(responseFromServer.getResponseBody());
+                    }
+                    socketChannel.register(selector, SelectionKey.OP_READ);
+                    break;
                 }
-                serverWriter.writeObject(requestToServer);
-                responseFromServer = (Response) serverReader.readObject();
-                PrettyPrinter.print(responseFromServer.getResponseBody());
             } catch (InvalidClassException | NotSerializableException e) {
                 PrettyPrinter.printError("An error occurred while trying to send data to the server.");
             } catch (ClassNotFoundException e) {
@@ -107,14 +122,14 @@ public class Client {
                     reconnectionAttempts++;
                     connectToServer();
                 } catch (ConnectionErrorException | ValueRangeException exception) {
-                    if (requestToServer.getCommandObjArg().equals("exit")) {
+                    if (Objects.requireNonNull(requestToServer).getCommandObjArg().equals("exit")) {
                         PrettyPrinter.println("This command will not be registered on the server,");
                     } else {
                         PrettyPrinter.println("Please try later.");
                     }
                 }
             }
-        } while (!requestToServer.getCommandName().equals("exit"));
+        } while (!Objects.requireNonNull(requestToServer).getCommandName().equals("exit") || socketChannel == null);
         return false;
     }
 }

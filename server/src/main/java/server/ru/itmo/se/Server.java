@@ -7,12 +7,17 @@ import common.ru.itmo.se.interaction.Request;
 import common.ru.itmo.se.interaction.Response;
 import common.ru.itmo.se.interaction.ResponseCode;
 import common.ru.itmo.se.utility.PrettyPrinter;
+import server.ru.itmo.se.utility.CollectionManager;
 import server.ru.itmo.se.utility.RequestHandler;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
+import java.net.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.*;
 
 public class Server {
@@ -20,7 +25,9 @@ public class Server {
     private int soTimeout;
     private ServerSocket serverSocket;
     private RequestHandler requestHandler;
-
+    private Selector serverSelector;
+    private Request request;
+    private Response response;
     public Server(int port, int soTimeout, RequestHandler requestHandler) {
         this.port = port;
         this.soTimeout = soTimeout;
@@ -28,23 +35,73 @@ public class Server {
     }
 
     public void run() {
+        Request requestFromUser = null;
+        Response responseToUser;
         try {
             openServerSocket();
-            boolean processingStatus = true;
-            while(processingStatus) {
-                try (Socket clientSocket = connectToClient()) {
-                    processingStatus = processClientRequest(clientSocket);
-                } catch (ConnectionErrorException | SocketTimeoutException e) {
-                    break;
-                } catch (IOException e) {
-                    PrettyPrinter.printError("An error occurred while trying to cut the connection to the client.");
-                    App.logger.log(Level.SEVERE, "An error occurred while trying to cut the connection to the client.");
+            while (true) {
+                serverSelector.select();
+                Iterator<SelectionKey> selectedKeys = serverSelector.selectedKeys().iterator();
+                while (selectedKeys.hasNext()) {
+                    SelectionKey key = selectedKeys.next();
+                    try {
+                        if (key.isValid()) {
+                            if (key.isAcceptable()) {
+                                ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
+                                SocketChannel clientChannel = serverSocketChannel.accept();
+                                clientChannel.configureBlocking(false);
+                                clientChannel.register(serverSelector, SelectionKey.OP_READ);
+                            }
+                            if (key.isReadable()) {
+                                SocketChannel clientChannel = (SocketChannel) key.channel();
+                                clientChannel.configureBlocking(false);
+                                ByteBuffer clientData = ByteBuffer.allocate(4096);
+                                try (ObjectInputStream clientDataIn = new ObjectInputStream(new ByteArrayInputStream(clientData.array()))) {
+                                    request = (Request) clientDataIn.readObject();
+                                } catch (StreamCorruptedException e) {
+                                    key.cancel();
+                                }
+                                if (request != null) {
+                                    response = requestHandler.handle(request);
+                                }
+                            }
+                            if (key.isWritable()) {
+                                SocketChannel clientChannel = (SocketChannel) key.channel();
+                                clientChannel.configureBlocking(false);
+                                try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                                     ObjectOutputStream clientDataOut = new ObjectOutputStream(bytes)) {
+                                    clientDataOut.writeObject(response);
+
+                                    ByteBuffer clientData = ByteBuffer.wrap(bytes.toByteArray());
+                                    ByteBuffer dataLen = ByteBuffer.allocate(32).putInt(clientData.limit());
+                                    dataLen.flip();
+
+                                    clientChannel.write(dataLen);
+                                    App.logger.log(Level.INFO, "Response length: " + dataLen.limit());
+                                    clientChannel.write(clientData);
+                                    App.logger.log(Level.INFO, "Response has been successfully sent to the client.");
+                                    clientData.clear();
+                                }
+                                clientChannel.register(serverSelector, SelectionKey.OP_READ);
+                            }
+                        }
+                    } catch (SocketException | CancelledKeyException e) {
+                        App.logger.log(Level.WARNING, "The client '" + key.channel().toString() + "' has disconnected.");
+                        key.cancel();
+                    }
+                    selectedKeys.remove();
                 }
             }
-            stop();
+        } catch (ArrayIndexOutOfBoundsException ignored) {
         } catch (OpeningServerSocketException e) {
             PrettyPrinter.printError("The server cannot be launched.");
             App.logger.log(Level.SEVERE, "FATAL: The server cannot be launched.");
+        } catch (IOException e) {
+            PrettyPrinter.printError("An I/O error occurred.");
+            App.logger.log(Level.SEVERE, "An I/O error occurred.");
+        } catch (ClassNotFoundException e) {
+            PrettyPrinter.printError("Non-matching classes.");
+            App.logger.log(Level.SEVERE, "Non-matching classes.");
         }
     }
 
@@ -72,8 +129,13 @@ public class Server {
     private void openServerSocket() {
         try {
             App.logger.log(Level.INFO, "Starting the server...");
-            serverSocket = new ServerSocket(port);
-            serverSocket.setSoTimeout(soTimeout);
+            serverSelector = Selector.open();
+            ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+            serverSocket = serverSocketChannel.socket();
+            serverSocket.bind(new InetSocketAddress(port));
+            serverSocketChannel.configureBlocking(false);
+            App.logger.log(Level.INFO, "The server socket channel is ready for operations.");
+            serverSocketChannel.register(serverSelector, SelectionKey.OP_ACCEPT);
             App.logger.log(Level.INFO, "The server has been successfully launched.");
         } catch (IllegalArgumentException e) {
             PrettyPrinter.printError("The port '" + port + "' is outside the allowed range.");
@@ -103,41 +165,6 @@ public class Server {
             App.logger.log(Level.SEVERE, "FATAL: An error occurred while trying to connect to the server.");
             throw new ConnectionErrorException("An error occurred while trying to connect to the server.", new RuntimeException());
         }
-    }
-    /**
-     *
-     * @param clientSocket
-     * @return
-     */
-    private boolean processClientRequest(Socket clientSocket) {
-        Request requestFromUser = null;
-        Response responseToUser;
-        try (ObjectInputStream clientReader = new ObjectInputStream(clientSocket.getInputStream());
-             ObjectOutputStream clientWriter = new ObjectOutputStream(clientSocket.getOutputStream())) {
-                 do {
-                     requestFromUser = (Request) clientReader.readObject();
-                     responseToUser = requestHandler.handle(requestFromUser);
-                     App.logger.log(Level.INFO, "Request '" + requestFromUser.getCommandName() + "' has been successfully received.");
-                     clientWriter.writeObject(responseToUser);
-                     clientWriter.flush();
-                 } while (responseToUser.getResponseCode() != ResponseCode.SERVER_EXIT);
-            return false;
-        } catch (ClassNotFoundException e) {
-            PrettyPrinter.printError("An error occurred while trying to read data from the user.");
-            App.logger.log(Level.SEVERE, "An error occurred while trying to read data from the user.");
-        } catch (InvalidClassException | NotSerializableException e) {
-            PrettyPrinter.printError("An error occurred while trying to send data to the user.");
-            App.logger.log(Level.SEVERE, "An error occurred while trying to send data to the user.");
-        } catch (IOException e) {
-            if(requestFromUser == null) {
-                PrettyPrinter.printError("An unexpected disconnection from the client occurred.");
-                App.logger.log(Level.WARNING, "An unexpected disconnection from the client occurred.");
-            } else {
-                PrettyPrinter.println("The client has successfully disconnected from the server.");
-                App.logger.log(Level.INFO, "The client has successfully disconnected from the server.");
-            }
-        }
-        return true;
     }
 }
 
