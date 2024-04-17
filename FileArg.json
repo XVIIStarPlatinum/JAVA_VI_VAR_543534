@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "name": "The Hu",
+    "coordinates": {
+      "x": 2.65545,
+      "y": 3.4849
+    },
+    "creationDate": "Apr 17, 2024, 6:08:12 PM",
+    "numberOfParticipants": 4,
+    "establishmentDate": "2016-03-16",
+    "musicGenre": "PSYCHEDELIC_ROCK",
+    "studio": {
+      "address": "Mongolia"
+    }
+  }
+]

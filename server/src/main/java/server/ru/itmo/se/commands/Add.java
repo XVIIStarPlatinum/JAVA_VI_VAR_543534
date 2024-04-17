@@ -58,6 +58,7 @@ public class Add extends CommandImpl {
                     musicBandRaw.getStudio()
             ));
             ResponseAppender.appendln("\u001b[3m" + "\"A fine addition to my collection.\" — General Grievous" + "\u001b[0m");
+            collectionManager.saveCollection();
             return true;
         } catch (InvalidArgumentCountException e) {
             ResponseAppender.appendln("Usage: '" + getName() + " " + getUsage() + "'");

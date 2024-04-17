@@ -39,7 +39,7 @@ public class Clear extends CommandImpl {
     @Override
     public boolean apply(String commandStrArg, Object commandObjArg) {
         try {
-            if (!commandStrArg.isEmpty() || commandObjArg == null) {
+            if (!commandStrArg.isEmpty() || commandObjArg != null) {
                 throw new InvalidArgumentCountException("You don't need an argument here.", new RuntimeException());
             }
             if (collectionManager.collectionSize() == 0) {

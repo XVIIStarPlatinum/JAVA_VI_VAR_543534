@@ -71,7 +71,6 @@ public class Client {
                 PrettyPrinter.println("Reconnecting to the server...");
             }
             socketChannel = SocketChannel.open(new InetSocketAddress(host, port));
-            socketChannel.configureBlocking(false);
             PrettyPrinter.println("Connection to the server has been successfully established.");
             PrettyPrinter.println("Now waiting for data exchange permission...");
             serverWriter = new ObjectOutputStream(socketChannel.socket().getOutputStream());

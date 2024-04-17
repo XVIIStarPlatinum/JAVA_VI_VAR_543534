@@ -76,7 +76,7 @@ public class UserHandler {
         commandTypeMap.put("print_field_descending_establishment_date", CommandType.WITHOUT_ARGS);
         commandTypeMap.put("remove_at", CommandType.WITH_ARGS);
         commandTypeMap.put("remove_by_id", CommandType.WITH_ARGS);
-        commandTypeMap.put("save", CommandType.WITH_ARGS);
+        commandTypeMap.put("save", CommandType.WITHOUT_ARGS);
         commandTypeMap.put("server_exit", CommandType.WITHOUT_ARGS);
         commandTypeMap.put("show", CommandType.WITHOUT_ARGS);
         commandTypeMap.put("shuffle", CommandType.WITHOUT_ARGS);
@@ -115,6 +115,12 @@ public class UserHandler {
                         userInput = userScanner.nextLine();
                     }
                     userCommand = (userInput.trim() + " ").split(" ", 2);
+                    if(shortHandCommandMap.containsKey(userCommand[0])) {
+                        userCommand[0] = shortHandCommandMap.get(userCommand[0]);
+                    }
+                    if(Pattern.matches(".*\\p{InCyrillic}.*", userCommand[0])) {
+                        userCommand[0] = typoTranscript(userCommand[0]);
+                    }
                     userCommand[1] = userCommand[1].trim();
                 } catch (NoSuchElementException | IllegalStateException e) {
                     PrettyPrinter.println();
@@ -173,34 +179,39 @@ public class UserHandler {
     }
     private ProcessingCode processCommand(String command, String commandArg) {
         try {
-            command = command.toLowerCase(Locale.ROOT);
-            if(Pattern.matches(".*\\p{InCyrillic}.*", command) || shortHandCommandMap.containsKey(command)) {
+            if(shortHandCommandMap.containsKey(command)) {
+                command = shortHandCommandMap.get(command);
+            }
+            if(Pattern.matches(".*\\p{InCyrillic}.*", command)) {
                 command = typoTranscript(command);
             }
             CommandType commandType = commandTypeMap.get(command);
             if(commandType == null) {
-                throw new NullValueException("", new RuntimeException());
+                return ProcessingCode.ERROR;
             } else {
                 return switch (commandType) {
                     case WITHOUT_ARGS -> {
+                        if(command.equals("save")) {
+                            throw new InvalidInputException("This command is deprecated as per 2.3.", new RuntimeException());
+                        }
                         if (!commandArg.isEmpty()) {
                             throw new CommandUsageException("", new RuntimeException());
                         }
-                        yield ProcessingCode.ERROR;
+                        yield ProcessingCode.OK;
                     }
                     case WITH_ARGS -> {
                         switch (command) {
                             case "remove_at", "remove_by_id" -> {
                                 if(commandArg.isEmpty()) throw new CommandUsageException("<id>", new RuntimeException());
-                                yield ProcessingCode.ERROR;
+                                yield ProcessingCode.OK;
                             }
                             case "filter_less_than_number_of_participants" -> {
                                 if(commandArg.isEmpty()) throw new CommandUsageException("<number_of_participants>", new RuntimeException());
-                                yield ProcessingCode.ERROR;
+                                yield ProcessingCode.OK;
                             }
                             case "execute_script" -> {
                                 if(commandArg.isEmpty()) throw new CommandUsageException("<file_name>", new RuntimeException());
-                                yield ProcessingCode.ERROR;
+                                yield ProcessingCode.OK;
                             }
                         }
                         yield ProcessingCode.OK;
@@ -212,7 +223,7 @@ public class UserHandler {
                         yield ProcessingCode.UPDATE;
                     }
                     case WITH_FORM -> {
-                        if (commandArg.isEmpty()) {
+                        if (!commandArg.isEmpty()) {
                             throw new CommandUsageException("{element}", new RuntimeException());
                         }
                         yield ProcessingCode.OBJECT;
@@ -225,6 +236,9 @@ public class UserHandler {
                 PrettyPrinter.println("Usage: '" + command + "'");
                 return ProcessingCode.ERROR;
             }
+        } catch (InvalidInputException e) {
+            PrettyPrinter.printError("This command has been deprecated as per v2.3.");
+            return ProcessingCode.ERROR;
         }
         return ProcessingCode.OK;
     }
@@ -235,10 +249,14 @@ public class UserHandler {
      * @param typo the typo in Russian (or a shorthand).
      * @return autocorrected command.
      */
-    String typoTranscript(String typo) {
-        String cmd = typoCommandMap.get(typo);
-        return getShortHandCommandMap().getOrDefault(cmd, cmd);
+    String shortHandTranslate(String typo) {
+        return getShortHandCommandMap().getOrDefault(typo, typo);
     }
+
+    String typoTranscript(String typo) {
+        return typoCommandMap.get(typo);
+    }
+
     private MusicBandRaw generateMusicBandAdd() {
         MusicBandValidator musicBandValidator = new MusicBandValidator(userScanner);
         if(fileMode()) {

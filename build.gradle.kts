@@ -17,7 +17,7 @@ subprojects {
 project(":server") {
     apply(plugin = "application")
     configure<JavaApplication> {
-        mainClass = "server"
+        mainClass = "server.ru.itmo.se.App"
     }
     dependencies {
         implementation(project(":common"))
@@ -27,7 +27,7 @@ project(":server") {
     }
     tasks.withType<Jar>{
         manifest {
-            attributes ["Main-Class"] = "server.App"
+            attributes ["Main-Class"] = "server.ru.itmo.se.App"
         }
     }
 }
@@ -40,7 +40,7 @@ project(":common") {
 project(":client") {
     apply(plugin = "application")
     configure<JavaApplication> {
-        mainClass = "client"
+        mainClass = "client.ru.itmo.se.App"
     }
     dependencies {
         implementation(project(":common"))
@@ -52,7 +52,7 @@ project(":client") {
     }
     tasks.withType<Jar> {
         manifest {
-            attributes["Main-Class"] = "client.App"
+            attributes["Main-Class"] = "client.ru.itmo.se.App"
         }
     }
 }

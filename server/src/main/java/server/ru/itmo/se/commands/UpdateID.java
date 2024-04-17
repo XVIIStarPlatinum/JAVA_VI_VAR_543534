@@ -61,24 +61,6 @@ public class UpdateID extends CommandImpl {
                 MusicGenre musicGenre = musicBandRaw.getMusicGenre() == null ? musicBandToUpdate.getMusicGenre() : musicBandRaw.getMusicGenre();
                 Studio studio = musicBandRaw.getStudio() == null ? musicBandToUpdate.getStudio() : musicBandRaw.getStudio();
                 collectionManager.removeFromCollection(musicBandToUpdate);
-//                if (musicBandValidator.askQuestion("Do you want to change the name of the music band?")) {
-//                    name = musicBandValidator.askName();
-//                }
-//                if (musicBandValidator.askQuestion("Do you want to change the coordinates of the organization?")) {
-//                    coordinates = musicBandValidator.askCoordinates();
-//                }
-//                if (musicBandValidator.askQuestion("Do you want to change the number of participants?")) {
-//                    numberOfParticipants = musicBandValidator.askNumberOfParticipants();
-//                }
-//                if (musicBandValidator.askQuestion("Do you want to change the establishment date?")) {
-//                    establishmentDate = musicBandValidator.askEstablishmentDate();
-//                }
-//                if (musicBandValidator.askQuestion("Do you want to change the genre of music?")) {
-//                    musicGenre = musicBandValidator.askMusicGenre();
-//                }
-//                if (musicBandValidator.askQuestion("Do you want to change the studio?")) {
-//                    studio = musicBandValidator.askStudio();
-//                }
                 collectionManager.addToCollection(new MusicBand(
                         id, name,
                         coordinates,
@@ -87,6 +69,7 @@ public class UpdateID extends CommandImpl {
                         establishmentDate,
                         musicGenre, studio
                 ));
+                collectionManager.saveCollection();
             } else {
                 throw new NullMusicBandException("There's no such music band.", new RuntimeException());
             }

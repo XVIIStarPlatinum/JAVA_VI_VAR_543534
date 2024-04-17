@@ -3,6 +3,7 @@ package server.ru.itmo.se.commands;
 import common.ru.itmo.se.interaction.CommandType;
 import lombok.ToString;
 import common.ru.itmo.se.exceptions.InvalidArgumentCountException;
+import server.ru.itmo.se.utility.CollectionManager;
 import server.ru.itmo.se.utility.ResponseAppender;
 
 /**
@@ -12,11 +13,14 @@ import server.ru.itmo.se.utility.ResponseAppender;
  */
 @ToString
 public class Exit extends CommandImpl {
+
+    private final CollectionManager collectionManager;
     /**
      * Constructs an Exit.
      */
-    public Exit() {
+    public Exit(CollectionManager collectionManager) {
         super("exit", "", "Gracefully terminates the console application on the client side.", CommandType.WITHOUT_ARGS);
+        this.collectionManager = collectionManager;
     }
 
     /**
@@ -32,6 +36,7 @@ public class Exit extends CommandImpl {
             if (!commandStrArg.isEmpty() || commandObjArg != null) {
                 throw new InvalidArgumentCountException("You don't need an argument here.", new RuntimeException());
             }
+            collectionManager.saveCollection();
             return true;
         } catch (InvalidArgumentCountException e) {
             ResponseAppender.appendln("Usage: '" + getName() + " " + getUsage() + "'");

@@ -40,7 +40,7 @@ public class ResponseAppender {
      * @param e2 second column object.
      */
     public static void appendTable(Object e1, Object e2) {
-        output.append(String.format("| %-64s | %-75s | %n", e1, e2)).append("=-".repeat(73));
+        output.append(String.format("| %-64s | %-75s | %n", e1, e2)).append("=-".repeat(73)).append("\n");
     }
 
     public static String getString() {

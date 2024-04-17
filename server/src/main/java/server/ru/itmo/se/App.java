@@ -53,7 +53,7 @@ public class App {
             addCommand("add", new Add(collectionManager));
             addCommand("clear", new Clear(collectionManager));
             addCommand("execute_script", new ExecuteScript());
-            addCommand("exit", new Exit());
+            addCommand("exit", new Exit(collectionManager));
             addCommand("filter_less_than_number_of_participants", new FilterLessThanNumberOfParticipants(collectionManager));
             addCommand("group_counting_by_establishment_date", new GroupCountingByEstablishmentDate(collectionManager));
             addCommand("help", new Help(this));
