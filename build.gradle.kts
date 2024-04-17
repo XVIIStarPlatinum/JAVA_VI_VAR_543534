@@ -22,6 +22,8 @@ project(":server") {
     dependencies {
         implementation(project(":common"))
         implementation("com.google.code.gson:gson:2.10.1")
+        compileOnly("org.projectlombok:lombok:1.18.30")
+        annotationProcessor("org.projectlombok:lombok:1.18.30")
     }
     tasks.withType<Jar>{
         manifest {
@@ -29,7 +31,12 @@ project(":server") {
         }
     }
 }
-
+project(":common") {
+    dependencies {
+        compileOnly("org.projectlombok:lombok:1.18.30")
+        annotationProcessor("org.projectlombok:lombok:1.18.30")
+    }
+}
 project(":client") {
     apply(plugin = "application")
     configure<JavaApplication> {
@@ -37,6 +44,8 @@ project(":client") {
     }
     dependencies {
         implementation(project(":common"))
+        compileOnly("org.projectlombok:lombok:1.18.30")
+        annotationProcessor("org.projectlombok:lombok:1.18.30")
     }
     tasks.withType<JavaExec>{
         standardInput = System.`in`
@@ -78,7 +87,4 @@ tasks.withType<JavaCompile> {
 }
 tasks.withType<Javadoc>{
     options.encoding = "UTF-8"
-}
-tasks.test {
-    useJUnitPlatform()
 }

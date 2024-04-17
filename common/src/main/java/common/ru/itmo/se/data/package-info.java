@@ -1,0 +1,1 @@
+package common.ru.itmo.se.data;
