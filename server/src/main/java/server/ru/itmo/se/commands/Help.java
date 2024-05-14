@@ -16,7 +16,7 @@ public class Help extends CommandImpl {
     /**
      * This field holds an instance of a CollectionManager which is responsible for operations with commands.
      */
-    private CommandManager commandManager;
+    private final CommandManager commandManager;
     /**
      * Constructs a Help.
      * @param commandManager the specified CommandManager.
@@ -29,8 +29,8 @@ public class Help extends CommandImpl {
     /**
      * This method is an implementation of the abstract apply() method for the Help command.
      *
-     * @param commandStrArg the argument (unnecessary).
-     * @param commandObjArg
+     * @param commandStrArg the command's string argument (unnecessary).
+     * @param commandObjArg the command's object argument (unnecessary).
      * @return true if the command was successfully executed, <p>false if the command encountered an error.
      */
     @Override
@@ -40,10 +40,7 @@ public class Help extends CommandImpl {
                 throw new InvalidArgumentCountException("You don't need an argument here.", new RuntimeException());
             }
             ResponseAppender.appendTable("                          COMMAND NAME", "                                  COMMAND SPECIFICATION");
-            for (CommandImpl command : commandManager.commandMap.values()) {
-
-                ResponseAppender.appendTable(command.getName(), command.getSpec());
-            }
+            commandManager.commandMap.values().forEach(command -> ResponseAppender.appendTable(command.getName(), command.getSpec()));
             return true;
         } catch (InvalidArgumentCountException e) {
             ResponseAppender.appendln("Usage: '" + getName() + " " + getUsage() + "'");

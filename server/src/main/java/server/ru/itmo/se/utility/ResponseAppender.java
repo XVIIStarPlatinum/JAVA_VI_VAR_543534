@@ -1,7 +1,12 @@
 package server.ru.itmo.se.utility;
 
+/**
+ * Class used for appending colored and formatted strings as a response.
+ */
 public class ResponseAppender {
-
+    /**
+     * This field is used to accumulate formatted strings.
+     */
     public static StringBuilder output = new StringBuilder();
 
     /**
@@ -43,16 +48,27 @@ public class ResponseAppender {
         output.append(String.format("| %-64s | %-75s | %n", e1, e2)).append("=-".repeat(73)).append("\n");
     }
 
+    /**
+     * This method is used to retrieve the accumulated string.
+     * @return resulting string.
+     */
     public static String getString() {
         return output.toString();
     }
 
+    /**
+     * This method is used to retrieve the accumulated string and to clear the buffer.
+     * @return resulting string.
+     */
     public static String getAndClear() {
         String toReturn = getString();
         output.delete(0, output.length());
         return toReturn;
     }
 
+    /**
+     * This method is used to clear the StringBuilder buffer.
+     */
     public static void clear() {
         output.delete(0, output.length());
     }

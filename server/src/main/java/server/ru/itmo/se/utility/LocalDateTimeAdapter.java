@@ -32,8 +32,8 @@ public class LocalDateTimeAdapter implements JsonSerializer<LocalDateTime>, Json
 
     /**
      * This method is a custom implementation of a serializing method for LocalDateTime.
-     * @param localDateTime LocalDateTime object that's going to be serialized.
-     * @param type which the element will be serialized to.
+     * @param localDateTime            LocalDateTime object that's going to be serialized.
+     * @param type                     which the element will be serialized to.
      * @param jsonSerializationContext context for deserialization that is passed to a custom serialize implementation.
      * @return serialized JSON element.
      */

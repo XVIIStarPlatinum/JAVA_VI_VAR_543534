@@ -10,9 +10,12 @@ import java.io.Serializable;
  * -- CONSTRUCTOR --
  * Constructs a Coordinates with the specified X and Y.
  */
+@Getter
 @AllArgsConstructor
 public class Coordinates implements Serializable {
-
+    /**
+     * This field holds the allowed deviation for comparing 2 float values.
+     */
     private static final float EPSILON = 0.000000001F;
     /**
      * This field holds the value of coordinate X.
@@ -23,17 +26,7 @@ public class Coordinates implements Serializable {
      * -- GETTER --
      * Getter method for coordinate Y. Since this field doesn't have initial constraints, it doesn't justify having a custom implementation.
      */
-    @Getter
     private float y;
-
-    /**
-     * A custom version of a getter method for coordinate X. It's made custom in accordance to initial constraints.
-     *
-     * @return float value of X, MIN_X in case of a NullPointerException.
-     */
-    public float getX() {
-        return x;
-    }
 
     /**
      * A custom implementation of the hashCode() method in Coordinates.

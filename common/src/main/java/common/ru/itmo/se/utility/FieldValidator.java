@@ -7,13 +7,18 @@ import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
+/**
+ * Class which is responsible for objects' correctness.
+ */
 public class FieldValidator {
-
+    /**
+     * This field stores the minimum allowed value for the abscissa (Coordinates.X) field.
+     */
     static final float MIN_X = -584.0F;
     /**
      * This field stores all the values of ID's. Set is used here to ensure the IDs' uniqueness constraint.
      */
-    private static Set<Integer> IDset = new TreeSet<>();
+    private static final Set<Integer> IDset = new TreeSet<>();
     /**
      * This method is used to check whether an ID conforms to the required constraints.
      *

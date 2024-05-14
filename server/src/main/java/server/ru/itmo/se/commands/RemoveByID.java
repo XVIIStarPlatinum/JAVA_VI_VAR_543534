@@ -34,8 +34,8 @@ public class RemoveByID extends CommandImpl {
 
     /**
      * This method is an implementation of the abstract apply() method for the remove_by_id command.
-     * @param commandStrArg the argument (necessary).
-     * @param commandObjArg
+     * @param commandStrArg the command's string argument (necessary).
+     * @param commandObjArg the command's object argument (unnecessary).
      * @return true if the command was successfully executed, <p>false if the command encountered an error.
      */
     @Override

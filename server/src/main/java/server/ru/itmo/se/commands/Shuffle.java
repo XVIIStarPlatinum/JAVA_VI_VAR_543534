@@ -31,8 +31,8 @@ public class Shuffle extends CommandImpl {
 
     /**
      * This method is an implementation of the abstract apply() method for the Shuffle command.
-     * @param commandStrArg the argument (unnecessary).
-     * @param commandObjArg
+     * @param commandStrArg the command's string argument (unnecessary).
+     * @param commandObjArg the command's object argument (unnecessary).
      * @return true if the command was successfully executed, <p>false if the command encountered an error.
      */
     @Override
@@ -45,6 +45,7 @@ public class Shuffle extends CommandImpl {
                 throw new EmptyCollectionException("Empty collection.", new RuntimeException());
             }
             collectionManager.shuffleCollection();
+            collectionManager.saveCollection();
             ResponseAppender.appendln("Collection successfully scrambled.");
             return true;
         } catch (InvalidArgumentCountException e) {

@@ -18,49 +18,65 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- *
+ * Utility class used for interpreting user requests.
  */
 public class UserHandler {
-
+    /**
+     * This field holds the scanner via which the application will receive inputs.
+     */
     private Scanner userScanner;
-
-    private Stack<File> scriptStack = new Stack<>();
-
-    private Stack<Scanner> scannerStack = new Stack<>();
+    /**
+     * This field holds commands that were input from a script file.
+     */
+    private final Stack<File> scriptStack = new Stack<>();
+    /**
+     * This field holds Scanners that are used for receiving inputs from a script file.
+     */
+    private final Stack<Scanner> scannerStack = new Stack<>();
     /**
      * This structure maps all typos caused by not switching from the Russian ᠱ"ЙЦУКЕН" layout to their actual commands.
      */
-    private Map<String, String> typoCommandMap = new LinkedHashMap<>();
-
-    private Map<String, CommandType> commandTypeMap = new LinkedHashMap<>();
+    private final Map<String, String> typoCommandMap = new LinkedHashMap<>();
+    /**
+     * This structure maps all commands to their corresponding types. It is used to discern better between commands.
+     */
+    private final Map<String, CommandType> commandTypeMap = new LinkedHashMap<>();
     /**
      * This structure maps all shorthand input (for long commands only, typing them is a pain in the ass) to their actual commands.
      * -- GETTER --
      * Getter method for the shorthand map.
      */
     @Getter
-    private Map<String, String> shortHandCommandMap = new LinkedHashMap<>();
+    private final Map<String, String> shortHandCommandMap = new LinkedHashMap<>();
+    /**
+     * Constructs a UserHandler with the specified userScanner.
+     * @param userScanner a Scanner instance which takes input from the user.
+     */
     public UserHandler(Scanner userScanner) {
         this.userScanner = userScanner;
     }
+
     {
         typoCommandMap.put("фвв", "add");
         typoCommandMap.put("сдуфк", "clear");
         typoCommandMap.put("учусгеу_ыскшзе", "execute_script");
-        typoCommandMap.put("учы", "exs");
+        typoCommandMap.put("учы", "execute_script");
         typoCommandMap.put("учше", "exit");
         typoCommandMap.put("ашдеук_дуыы_ерфт_тгьиук_ща_зфкешсшзфтеы", "filter_less_than_number_of_participants");
-        typoCommandMap.put("адетщз", "fltnop");
+        typoCommandMap.put("адетщз", "filter_less_than_number_of_participants");
         typoCommandMap.put("пкщгз_сщгтештп_ин_уыефидшырьуте_вфеу", "group_counting_by_establishment_date");
-        typoCommandMap.put("псиув", "gcbed");
+        typoCommandMap.put("псиув", "group_counting_by_establishment_date");
         typoCommandMap.put("рудз", "help");
         typoCommandMap.put("ршыещкн", "history");
         typoCommandMap.put("штащ", "info");
         typoCommandMap.put("зкште_ашудв_вуысутвштп_уыефидшырьуте_вфеу", "print_field_descending_establishment_date");
-        typoCommandMap.put("завув", "pfded");
+        typoCommandMap.put("завув", "print_field_descending_establishment_date");
         typoCommandMap.put("куьщму_фе", "remove_at");
         typoCommandMap.put("куьщму_ин_шв", "remove_by_id");
+        typoCommandMap.put("к_фе", "remove_at");
+        typoCommandMap.put("к_шв", "remove_by_id");
         typoCommandMap.put("ыфму", "save");
+        typoCommandMap.put("ыукмук_учше", "server_exit");
         typoCommandMap.put("ырщц", "show");
         typoCommandMap.put("ыргааду", "shuffle");
         typoCommandMap.put("гзвфеу", "update");
@@ -88,6 +104,12 @@ public class UserHandler {
         shortHandCommandMap.put("r_at", "remove_at");
         shortHandCommandMap.put("r_id", "remove_by_id");
     }
+
+    /**
+     * This method is used to interpret user requests and server responses.
+     * @param serverResponseCode response code which will determine the method's output.
+     * @return interpreted request from the user.
+     */
     public Request handle(ResponseCode serverResponseCode) {
         String userInput;
         String[] userCommand;
@@ -102,7 +124,7 @@ public class UserHandler {
                     while(fileMode() && !userScanner.hasNextLine()) {
                         userScanner.close();
                         userScanner = scannerStack.pop();
-                        PrettyPrinter.println("Returning to script '" + scriptStack.pop().getName() + "'...");
+                        PrettyPrinter.println("Returning from script '" + scriptStack.pop().getName() + "'...");
                     }
                     if(fileMode()) {
                         userInput = userScanner.nextLine();
@@ -115,12 +137,6 @@ public class UserHandler {
                         userInput = userScanner.nextLine();
                     }
                     userCommand = (userInput.trim() + " ").split(" ", 2);
-                    if(shortHandCommandMap.containsKey(userCommand[0])) {
-                        userCommand[0] = shortHandCommandMap.get(userCommand[0]);
-                    }
-                    if(Pattern.matches(".*\\p{InCyrillic}.*", userCommand[0])) {
-                        userCommand[0] = typoTranscript(userCommand[0]);
-                    }
                     userCommand[1] = userCommand[1].trim();
                 } catch (NoSuchElementException | IllegalStateException e) {
                     PrettyPrinter.println();
@@ -177,6 +193,13 @@ public class UserHandler {
         }
         return new Request(userCommand[0], userCommand[1]);
     }
+
+    /**
+     * This method is used to interpret and validate user inputs.
+     * @param command    the command's name.
+     * @param commandArg the command's argument.
+     * @return processing code which determines the console app's output.
+     */
     private ProcessingCode processCommand(String command, String commandArg) {
         try {
             if(shortHandCommandMap.containsKey(command)) {
@@ -187,12 +210,16 @@ public class UserHandler {
             }
             CommandType commandType = commandTypeMap.get(command);
             if(commandType == null) {
+                PrettyPrinter.println("Command '" + command + "' not found. Use command 'help' for advice.");
                 return ProcessingCode.ERROR;
             } else {
                 return switch (commandType) {
                     case WITHOUT_ARGS -> {
                         if(command.equals("save")) {
-                            throw new InvalidInputException("This command is deprecated as per 2.3.", new RuntimeException());
+                            throw new InvalidInputException("This command is deprecated as per v2.3.", new RuntimeException());
+                        }
+                        if(command.equals("server_exit")){
+                            throw new InvalidInputException("This command was once an old programmer's pipe dream...", new RuntimeException());
                         }
                         if (!commandArg.isEmpty()) {
                             throw new CommandUsageException("", new RuntimeException());
@@ -211,7 +238,7 @@ public class UserHandler {
                             }
                             case "execute_script" -> {
                                 if(commandArg.isEmpty()) throw new CommandUsageException("<file_name>", new RuntimeException());
-                                yield ProcessingCode.OK;
+                                yield ProcessingCode.SCRIPT;
                             }
                         }
                         yield ProcessingCode.OK;
@@ -249,14 +276,14 @@ public class UserHandler {
      * @param typo the typo in Russian (or a shorthand).
      * @return autocorrected command.
      */
-    String shortHandTranslate(String typo) {
-        return getShortHandCommandMap().getOrDefault(typo, typo);
-    }
-
     String typoTranscript(String typo) {
         return typoCommandMap.get(typo);
     }
 
+    /**
+     * This method generates a MusicBand to be serialized and sent to the server.
+     * @return Music Band in serializable form.
+     */
     private MusicBandRaw generateMusicBandAdd() {
         MusicBandValidator musicBandValidator = new MusicBandValidator(userScanner);
         if(fileMode()) {
@@ -272,6 +299,10 @@ public class UserHandler {
         );
     }
 
+    /**
+     * This method generates a MusicBand to be serialized and sent to the server as an update.
+     * @return Music Band in serializable form.
+     */
     private MusicBandRaw generateMusicBandUpdate() {
         MusicBandValidator musicBandValidator = new MusicBandValidator(userScanner);
         if(fileMode()) {
@@ -291,6 +322,10 @@ public class UserHandler {
         );
     }
 
+    /**
+     * This method determines whether the input is received from a file or not.
+     * @return true if the input is from a file (script),<p>and false if the input is from a keyboard.
+     */
     private boolean fileMode() {
         return !scannerStack.isEmpty();
     }

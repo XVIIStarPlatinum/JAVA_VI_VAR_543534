@@ -17,7 +17,7 @@ public class History extends CommandImpl {
     /**
      * This field holds an instance of a CommandManager which is responsible for operations with commands.
      */
-    private CommandManager commandManager;
+    private final CommandManager commandManager;
     /**
      * Constructs a History with the specified CommandManager.
      * @param commandManager the specified CommandManager.
@@ -28,8 +28,8 @@ public class History extends CommandImpl {
     }
     /**
      * This method is an implementation of the abstract apply() method for the History command.
-     * @param commandStrArg the argument (unnecessary).
-     * @param commandObjArg
+     * @param commandStrArg the command's string argument (unnecessary).
+     * @param commandObjArg the command's object argument (unnecessary).
      * @return true if the command was successfully executed, <p>false if the command encountered an error.
      */
     @Override
@@ -38,10 +38,10 @@ public class History extends CommandImpl {
             if (!commandStrArg.isEmpty() || commandObjArg != null) {
                 throw new InvalidArgumentCountException("You don't need an argument here.", new RuntimeException());
             }
-            if (commandManager.commandHistory[0].isEmpty()) {
+            if (commandManager.commandHistory[0] == null) {
                 throw new EmptyHistoryException("You just started this session, of course the history is empty.", new RuntimeException());
             }
-            ResponseAppender.appendln("Recently used commands:");
+            ResponseAppender.appendln("Recently used 10 commands:");
             for (String s : commandManager.commandHistory) {
                 if (s != null) ResponseAppender.appendln(" " + s);
             }

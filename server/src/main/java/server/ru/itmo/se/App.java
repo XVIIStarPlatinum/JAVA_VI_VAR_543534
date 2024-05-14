@@ -12,16 +12,27 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.logging.*;
 
-
+/**
+ * Driver class for the server application.
+ */
 public class App {
-
-    public static final int PORT = 1488;
-
-    public static final int CONNECTION_TIMEOUT = 60 * 1000;
-
+    /**
+     * The server's port number. Used as an interface for initiating a connection with the client.
+     */
+    public static int PORT;
+    /**
+     * The server's file name argument.
+     */
     public static String cliArgument = null;
+    /**
+     * The server's logging utility. It records every action.
+     */
     public static Logger logger = Logger.getLogger(App.class.getName());
 
+    /**
+     * The driver method used to start the server.
+     * @param args arguments provided from the user. In this case it's the port and the file name.
+     */
     public static void main(String[] args) {
         if(args.length == 0) {
             PrettyPrinter.printError("There must be an argument. Please try again.");
@@ -33,6 +44,7 @@ public class App {
                 PrettyPrinter.printError("You don't have access to this file. Try again, maybe after doing chmod 777 or something.");
                 System.exit(1);
             }
+            PORT = Integer.parseInt(args[1]);
             if(!file.isFile()) {
                 try {
                     if(file.createNewFile()) {
@@ -68,7 +80,7 @@ public class App {
             addCommand("update", new UpdateID(collectionManager));
         }};
         RequestHandler requestHandler = new RequestHandler(commandManager);
-        Server server = new Server(PORT, CONNECTION_TIMEOUT, requestHandler);
+        Server server = new Server(PORT, requestHandler);
         server.run();
     }
 }

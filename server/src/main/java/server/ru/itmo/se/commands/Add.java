@@ -36,8 +36,8 @@ public class Add extends CommandImpl {
 
     /**
      * This method is an implementation of the abstract apply() method for the add command.
-     * @param commandStrArg
-     * @param commandObjArg
+     * @param commandStrArg the command's string argument (unnecessary).
+     * @param commandObjArg the command's object argument (necessary).
      * @return true if the command was successfully executed, <p>false if the command encountered an error.
      */
     @Override

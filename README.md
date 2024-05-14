@@ -87,4 +87,10 @@ ___
 
 ___
 
-### Диаграмма классов: [UML](Lab6-UML.png)
+### Диаграмма классов: [UML](resources/Lab6-UML.png)
+---
+### Как задеплоить прогу:
+```
+java -jar server-all.jar <filename> <port>
+java -jar client-all.jar <host> <port>
+```

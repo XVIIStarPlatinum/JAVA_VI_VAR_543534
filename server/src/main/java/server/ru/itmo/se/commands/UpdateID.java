@@ -6,7 +6,6 @@ import common.ru.itmo.se.data.*;
 import common.ru.itmo.se.interaction.MusicBandRaw;
 import common.ru.itmo.se.exceptions.EmptyCollectionException;
 import common.ru.itmo.se.exceptions.InvalidArgumentCountException;
-import common.ru.itmo.se.exceptions.InvalidInputException;
 import common.ru.itmo.se.exceptions.NullMusicBandException;
 import server.ru.itmo.se.utility.CollectionManager;
 import server.ru.itmo.se.utility.ResponseAppender;
@@ -37,7 +36,8 @@ public class UpdateID extends CommandImpl {
 
     /**
      * This method is an implementation of the abstract apply() method for the update command.
-     * @param commandStrArg the argument (unnecessary).
+     * @param commandStrArg the command's string argument (necessary).
+     * @param commandObjArg the command's object argument (necessary).
      * @return true if the command was successfully executed, <p>false if the command encountered an error.
      */
     @Override

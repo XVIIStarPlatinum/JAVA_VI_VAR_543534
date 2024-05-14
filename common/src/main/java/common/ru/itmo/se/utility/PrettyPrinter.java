@@ -1,5 +1,8 @@
 package common.ru.itmo.se.utility;
 
+/**
+ * Class used for outputting colored and formatted strings.
+ */
 public class PrettyPrinter {
     /**
      * This method is a custom implementation of the print() method. The output is colored purple with the Help of a corresponding ANSI code.
@@ -17,11 +20,14 @@ public class PrettyPrinter {
         System.out.println("\u001B[32m" + toOut + "\u001B[0m");
     }
 
+    /**
+     * This method is used to create a newline.
+     */
     public static void println() {
         System.out.println();
     }
     /**
-     * This method is a custom implementation of the err.print() method. The output is colored black with red background with the Help of corresponding ANSI codes.
+     * This method is a custom implementation of the err.print() method. The output is colored black with red background with the help of corresponding ANSI codes.
      * @param toOut the error that was raised.
      */
     public static void printError(Object toOut) {

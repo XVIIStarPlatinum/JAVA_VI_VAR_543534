@@ -1,6 +1,5 @@
 package server.ru.itmo.se.utility;
 
-import common.ru.itmo.se.utility.PrettyPrinter;
 import lombok.Getter;
 import common.ru.itmo.se.data.MusicBand;
 
@@ -40,7 +39,6 @@ public class CollectionManager {
 
     /**
      * Constructs a CollectionManager with the specified file manager.
-     *
      * @param fileManager FileManager instance.
      */
     public CollectionManager(FileManager fileManager) {
@@ -97,7 +95,6 @@ public class CollectionManager {
 
     /**
      * This method is used to sort the collection (by the music bands' ID value).
-     *
      * @param musicBands the collection to be sorted. Java usually uses Merge sort for this problem.
      */
     private static void sortCollection(List<MusicBand> musicBands) {
@@ -108,11 +105,9 @@ public class CollectionManager {
      * This method prints all the collection's unique dates and the number of their occurrences.
      */
     public void groupCountingByEstablishmentDate() {
-        PrettyPrinter.println("Counting the collection's establishment dates grouped by occurrences:");
+        ResponseAppender.appendln("Counting the collection's establishment dates grouped by occurrences:");
         Map<LocalDateTime, Long> establishmentDateMap = musicBandCollection.stream().collect(Collectors.groupingBy(MusicBand::getEstablishmentDate, Collectors.counting()));
-        for (Map.Entry<LocalDateTime, Long> establishmentDate : establishmentDateMap.entrySet()) {
-            PrettyPrinter.println(establishmentDate.getKey() + ": " + establishmentDate.getValue());
-        }
+        establishmentDateMap.forEach((localDateTime, aLong) -> ResponseAppender.appendln(localDateTime + ": " + aLong));
     }
 
     /**
@@ -140,20 +135,18 @@ public class CollectionManager {
         Collection<MusicBand> copy = new TreeSet<>(Collections.reverseOrder(MusicBand::compareToEstablishmentDate));
         ArrayList<LocalDateTime> arrayList = new ArrayList<>();
         copy.addAll(musicBandCollection);
-        for (MusicBand musicBand : copy) {
-            arrayList.add(musicBand.getEstablishmentDate());
-        }
-        PrettyPrinter.println(arrayList.toString().trim());
+        copy.forEach(musicBand -> arrayList.add(musicBand.getEstablishmentDate()));
+        ResponseAppender.appendln(arrayList.toString().trim());
     }
 
     /**
-     * This method filters the collection for elements which have fewer participants than given.
+     * This method filters the collection for elements that have fewer participants than given.
      * @param numberOfParticipants the number of participants to be compared to.
      * @return elements with fewer participants than given as String.
      */
     public String musicBandParticipantsFilteredInfo(Long numberOfParticipants) {
         return musicBandCollection.stream().filter(musicBand -> musicBand.getNumberOfParticipants().equals(numberOfParticipants))
-                .reduce("", (sum, p) -> sum += p + "\n\n", (sum1, sum2) -> sum1 + sum2).trim();
+                .reduce("", (sum, p) -> sum + (p + "\n\n"), (sum1, sum2) -> sum1 + sum2).trim();
     }
 
     /**
@@ -222,9 +215,8 @@ public class CollectionManager {
             return "Empty collection.";
         }
         StringBuilder info = new StringBuilder();
-        for (MusicBand musicBand : musicBandCollection) {
-            info.append(musicBand.toString()).append("\n").append("-=".repeat(41)).append("\n");
-        }
+        musicBandCollection.forEach(musicBand ->
+                info.append(musicBand.toString()).append("\n").append("-=".repeat(41)).append("\n"));
         return info.toString();
     }
 }
