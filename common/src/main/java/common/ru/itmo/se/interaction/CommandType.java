@@ -1,7 +1,5 @@
 package common.ru.itmo.se.interaction;
 
-import java.io.Serializable;
-
 import lombok.Getter;
 
 /**
@@ -9,7 +7,7 @@ import lombok.Getter;
  * Idea suggested by @Vediusse.
  */
 @Getter
-public enum CommandType implements Serializable {
+public enum CommandType {
     /**
      * This value represents commands without any arguments. The commands are: <p>
      * clear, exit,<p>group_counting_by_establishment_date,<p>help, history, info,<p>print_field_descending_establishment_date, <p>show, shuffle.

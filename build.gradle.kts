@@ -29,6 +29,7 @@ project(":server") {
         manifest {
             attributes ["Main-Class"] = "server.ru.itmo.se.App"
         }
+        destinationDirectory = File("$rootDir/Deploy")
     }
 }
 project(":common") {
@@ -54,6 +55,7 @@ project(":client") {
         manifest {
             attributes["Main-Class"] = "client.ru.itmo.se.App"
         }
+        destinationDirectory = File("$rootDir/Deploy")
     }
 }
 

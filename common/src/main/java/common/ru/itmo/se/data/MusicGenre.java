@@ -1,11 +1,9 @@
 package common.ru.itmo.se.data;
 
-import java.io.Serializable;
-
 /**
  * This enum represents all the possible values for the value of the music band's genre.
  */
-public enum MusicGenre implements Serializable {
+public enum MusicGenre {
     /**
      * This value represents that of a psychedelic rock band.
      */

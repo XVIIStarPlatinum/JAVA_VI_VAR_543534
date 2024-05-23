@@ -45,7 +45,7 @@ public class Shuffle extends CommandImpl {
                 throw new EmptyCollectionException("Empty collection.", new RuntimeException());
             }
             collectionManager.shuffleCollection();
-            collectionManager.saveCollection();
+            // collectionManager.saveCollection();
             ResponseAppender.appendln("Collection successfully scrambled.");
             return true;
         } catch (InvalidArgumentCountException e) {
