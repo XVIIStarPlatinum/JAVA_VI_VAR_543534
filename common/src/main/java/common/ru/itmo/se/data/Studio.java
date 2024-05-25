@@ -3,6 +3,7 @@ package common.ru.itmo.se.data;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -13,6 +14,11 @@ import java.io.Serializable;
 @Getter
 @AllArgsConstructor
 public class Studio implements Serializable {
+    /**
+     * This field holds the value for SerialVersion, which is a good practice when you're trying to serialize an object.
+     */
+    @Serial
+    private static final long SerialVersionUID = 1;
     /**
      * This field holds the value of the studio's address.
      */

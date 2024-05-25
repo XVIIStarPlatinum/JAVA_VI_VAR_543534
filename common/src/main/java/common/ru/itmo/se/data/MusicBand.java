@@ -6,6 +6,8 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * This class represents the primary composite data type which describes a music band.
@@ -14,7 +16,12 @@ import java.util.Objects;
  */
 @Getter
 @AllArgsConstructor
-public class MusicBand implements Comparable<MusicBand> {
+public class MusicBand implements Comparable<MusicBand>, Serializable {
+    /**
+     * This field holds the value for SerialVersion, which is a good practice when you're trying to serialize an object.
+     */
+    @Serial
+    private static final long SerialVersionUID = 1;
     /**
      * This field holds the value of an ID via which a user can identify an element of the collection.
      * -- GETTER --
