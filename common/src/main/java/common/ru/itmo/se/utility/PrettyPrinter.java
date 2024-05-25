@@ -9,7 +9,7 @@ public class PrettyPrinter {
      * @param toOut the object to be printed.
      */
     public static void print(Object toOut) {
-        System.out.print("\033[1;35m" + toOut + "\u001B[0m");
+        System.out.print("\u001B[1;35m" + toOut + "\u001B[0m");
     }
 
     /**
@@ -40,7 +40,7 @@ public class PrettyPrinter {
      * @param e2 second column object.
      */
     public static void printTable(Object e1, Object e2) {
-        System.out.printf("\u001B[36m" + "| %-64s | %-75s | %n", e1, e2);
+        System.out.printf("\u001B[36m" + "| %-64s | %-12s | %-75s | %n", e1, e2);
         System.out.print("\u001B[35m" + "=-".repeat(73) + "\n");
     }
 }

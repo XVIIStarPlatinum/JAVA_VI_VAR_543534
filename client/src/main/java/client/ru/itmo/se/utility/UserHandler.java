@@ -208,6 +208,9 @@ public class UserHandler {
             if(Pattern.matches(".*\\p{InCyrillic}.*", command)) {
                 command = typoTranscript(command);
             }
+            if(shortHandCommandMap.containsKey(command)) {
+                command = shortHandCommandMap.get(command);
+            }
             CommandType commandType = commandTypeMap.get(command);
             if(commandType == null) {
                 PrettyPrinter.println("Command '" + command + "' not found. Use command 'help' for advice.");

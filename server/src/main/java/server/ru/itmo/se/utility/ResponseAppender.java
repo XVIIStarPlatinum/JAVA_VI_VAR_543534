@@ -14,14 +14,14 @@ public class ResponseAppender {
      * @param toOut the object to be printed.
      */
     public static void append(Object toOut) {
-        output.append(toOut);
+        output.append("\u001B[1;35m" + toOut + "\u001B[0m");
     }
 
     /**
      * This method is a custom implementation of the println() method. The output is colored green with the Help of a corresponding ANSI code.
      */
     public static void appendln() {
-        output.append("\n");
+        output.append("\u001B[0m\n");
     }
 
     /**
@@ -29,23 +29,24 @@ public class ResponseAppender {
      * @param toOut the object to be printed.
      */
     public static void appendln(Object toOut) {
-        output.append(toOut).append("\n");
+        output.append("\u001B[32m" + toOut + "\u001B[0m").append("\n");
     }
     /**
      * This method is a custom implementation of the err.print() method. The output is colored black with red background with the Help of corresponding ANSI codes.
      * @param toOut the error that was raised.
      */
     public static void appendError(Object toOut) {
-        output.append("Error: ").append(toOut).append("\n");
+        output.append("\u001B[41m + \u001B[30m" + "Error: ").append(toOut).append("\u001B[0m\n");
     }
 
     /**
      * This method is used to output all the commands in a table format. The row border is colored purple, the object and the column border is colored cyan with the Help of corresponding ANSI codes.
      * @param e1 first column object.
      * @param e2 second column object.
+     * @param e3 third column object.
      */
-    public static void appendTable(Object e1, Object e2) {
-        output.append(String.format("| %-64s | %-75s | %n", e1, e2)).append("=-".repeat(73)).append("\n");
+    public static void appendTable(Object e1, Object e2, Object e3) {
+        output.append(String.format("\u001B[36m| %-64s | %-16s | %-75s | %n", e1, e2, e3)).append("\u001B[35m=-".repeat(73)).append("\u001B[0m\n");
     }
 
     /**

@@ -157,7 +157,7 @@ public class Client {
                 socketChannel.read(dataToReceive);
                 try(ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(dataToReceive.array()))) {
                     responseFromServer = (Response) objectInputStream.readObject();
-                    PrettyPrinter.print(responseFromServer.getResponseBody());
+                    System.out.print(responseFromServer.getResponseBody());
                 }
             } catch (InvalidClassException | NotSerializableException e) {
                 PrettyPrinter.printError("An error occurred while trying to send data to the server.");
