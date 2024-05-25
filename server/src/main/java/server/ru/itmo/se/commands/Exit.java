@@ -22,7 +22,7 @@ public class Exit extends CommandImpl {
      * @param collectionManager the specified CollectionManager.
      */
     public Exit(CollectionManager collectionManager) {
-        super("exit", "", "Gracefully terminates the console application on the client side.", CommandType.WITHOUT_ARGS);
+        super("exit", "", "Gracefully terminates the console application on the client side", CommandType.WITHOUT_ARGS);
         this.collectionManager = collectionManager;
     }
 

@@ -39,7 +39,7 @@ public class Help extends CommandImpl {
             if (!commandStrArg.isEmpty() || commandObjArg != null) {
                 throw new InvalidArgumentCountException("You don't need an argument here.", new RuntimeException());
             }
-            ResponseAppender.appendTable("                          COMMAND NAME", "COMMAND ARGUMENT", "                                  COMMAND SPECIFICATION");
+            ResponseAppender.appendTable("               COMMAND NAME", "    COMMAND ARGUMENT", "                            COMMAND SPECIFICATION");
             commandManager.commandMap.values().forEach(command -> ResponseAppender.appendTable(command.getName(), command.getUsage(), command.getSpec()));
             return true;
         } catch (InvalidArgumentCountException e) {

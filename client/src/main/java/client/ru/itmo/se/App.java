@@ -78,6 +78,7 @@ public class App {
         SignalHandler handler = sig -> {
             System.out.println();
             PrettyPrinter.printError("Ctrl+C? How dare you!\u001B[0m");
+            System.exit(0);
         };
         Signal.handle(new Signal("INT"), handler);
         Signal.handle(new Signal("ABRT"), handler);

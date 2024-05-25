@@ -46,7 +46,7 @@ public class ResponseAppender {
      * @param e3 third column object.
      */
     public static void appendTable(Object e1, Object e2, Object e3) {
-        output.append(String.format("\u001B[36m| %-64s | %-16s | %-75s | %n", e1, e2, e3)).append("\u001B[35m=-".repeat(73)).append("\u001B[0m\n");
+        output.append(String.format("\u001B[36m| %-41s | %-24s | %-75s | %n", e1, e2, e3)).append("\u001B[35m=-".repeat(75)).append("\u001B[0m\n");
     }
 
     /**
